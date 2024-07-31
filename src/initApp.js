@@ -18,6 +18,7 @@ export const initApp = (express, app) => {
   app.use("/products", routers.productRouter);
   app.use("/coupons", routers.couponRouter);
   app.use("/carts", routers.cartRouter);
+  app.use("/orders", routers.orderRouter);
 
   //handle invalid URLs.
   app.use("*", (req, res, next) => {

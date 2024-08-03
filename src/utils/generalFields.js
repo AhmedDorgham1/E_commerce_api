@@ -2,9 +2,7 @@ import joi from "joi";
 import { Types } from "mongoose";
 
 const validationObjectId = (value, helper) => {
-  return Types.ObjectId.isValid(value)
-    ? true
-    : helper.message("invalid object _id");
+  return Types.ObjectId.isValid(value) ? true : helper.message("invalid object _id");
 };
 
 export const generalFiled = {
@@ -17,7 +15,7 @@ export const generalFiled = {
     .regex(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/)
     .required(),
   rePassword: joi.string().valid(joi.ref("password")).required(),
-  id: joi.string().custom(validationObjectId).required(),
+  id: joi.string().custom(validationObjectId),
   file: joi.object({
     size: joi.number().positive().required(),
     path: joi.string().required(),

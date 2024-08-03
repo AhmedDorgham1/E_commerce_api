@@ -11,8 +11,9 @@ export const createOrder = asyncHandler(async (req, res, next) => {
   const { productId, quantity, couponCode, address, phone, paymentMethod } = req.body;
 
   if (couponCode) {
-    const coupon = await couponModel.findOne({ code: couponCode.toLowerCase() });
-    if (!coupon || coupon.toDate < Date.now()) return next(new AppError("coupon not exist or expired", 404));
+    const coupon = await couponModel.findOne({ code: couponCode.toLowerCase(), usedBy: { $nin: [req.user._id] } });
+    if (!coupon || coupon.toDate < Date.now())
+      return next(new AppError("invalid coupon code or coupon already used or expired", 404));
     req.body.coupon = coupon;
   }
 
@@ -40,7 +41,7 @@ export const createOrder = asyncHandler(async (req, res, next) => {
     }
     product.title = checkProduct.title;
     product.price = checkProduct.price;
-    product.finalPrice = checkProduct.subPrice;
+    product.finalPrice = checkProduct.subPrice * product.quantity;
 
     subPrice += product.finalPrice;
 

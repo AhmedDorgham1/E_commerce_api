@@ -15,3 +15,16 @@ export const createOrder = {
 
   headers: generalFiled.headers.required(),
 };
+
+export const cancelOrder = {
+  body: joi.object({
+    reason: joi.string(),
+  }),
+  params: joi
+    .object({
+      id: generalFiled.id.required(),
+    })
+    .required(),
+
+  headers: generalFiled.headers.required(),
+};

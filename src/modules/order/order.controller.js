@@ -96,11 +96,20 @@ export const cancelOrder = asyncHandler(async (req, res, next) => {
     return next(new AppError("you can not cancel this order", 400));
   }
 
+  await orderModel.updateOne(
+    { _id: id },
+    {
+      status: "cancelled",
+      reason,
+      cancelledBy: req.user._id,
+    }
+  );
+
   if (order?.couponId) {
     await couponModel.updateOne({ _id: order?.couponId }, { $pull: { usedBy: req.user._id } });
   }
 
-  for (const product of finalProducts) {
+  for (const product of order.products) {
     await productModel.findByIdAndUpdate(
       { _id: product.productId },
       {
@@ -108,4 +117,5 @@ export const cancelOrder = asyncHandler(async (req, res, next) => {
       }
     );
   }
+  res.status(200).json({ msg: "done" });
 });

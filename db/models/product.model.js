@@ -78,6 +78,10 @@ const productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    rateNum: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

@@ -4,9 +4,11 @@ import { multerHost, validExtensions } from "../../middleware/multer.js";
 import { validation } from "../../middleware/validation.js";
 import { auth } from "../../middleware/auth.js";
 import * as SCV from "./product.validation.js";
-import { systemRoles } from "../../utils/systemRoles.js";
+import reviewRouter from "../review/review.routes.js";
 
-const productRouter = express.Router({ mergeParams: true });
+const productRouter = express.Router();
+
+productRouter.use("/:productId/reviews", reviewRouter);
 
 productRouter.post(
   "/",

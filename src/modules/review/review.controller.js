@@ -49,3 +49,26 @@ export const createReview = asyncHandler(async (req, res, next) => {
 
   res.status(201).json({ msg: "done", review });
 });
+
+//==================================== deleteReview ===================================================
+
+export const deleteReview = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+
+  const review = await reviewModel.findByIdAndDelete(id);
+  if (!review) {
+    return next(new AppError("review does not exist", 404));
+  }
+
+  const product = await productModel.findById(review.productId);
+
+  let sum = product.rateAvg * product.rateNum;
+  sum -= review.rate;
+
+  product.rateNum--;
+  product.rateAvg = sum / product.rateNum;
+
+  await product.save();
+
+  res.status(200).json({ msg: "done" });
+});

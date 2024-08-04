@@ -8,5 +8,6 @@ import * as RV from "./review.validation.js";
 const reviewRouter = express.Router({ mergeParams: true });
 
 reviewRouter.post("/", validation(RV.createReview), auth(["admin"]), RC.createReview);
+reviewRouter.delete("/:id", validation(RV.deleteReview), auth(["admin"]), RC.deleteReview);
 
 export default reviewRouter;

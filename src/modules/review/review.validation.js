@@ -11,3 +11,8 @@ export const createReview = {
   params: joi.object({ productId: generalFiled.id.required() }).required(),
   headers: generalFiled.headers.required(),
 };
+
+export const deleteReview = {
+  params: joi.object({ id: generalFiled.id.required() }).required(),
+  headers: generalFiled.headers.required(),
+};

@@ -9,5 +9,6 @@ import { systemRoles } from "../../utils/systemRoles.js";
 const orderRouter = express.Router();
 
 orderRouter.post("/", validation(OV.createOrder), auth(Object.values(systemRoles)), OC.createOrder);
+orderRouter.put("/:id", validation(OV.cancelOrder), auth(Object.values(systemRoles)), OC.cancelOrder);
 
 export default orderRouter;

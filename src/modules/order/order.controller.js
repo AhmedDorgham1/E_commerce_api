@@ -55,10 +55,57 @@ export const createOrder = asyncHandler(async (req, res, next) => {
     couponId: req.body?.coupon?._id,
     totalPrice: subPrice - subPrice * ((req.body.coupon?.amount || 0) / 100),
     paymentMethod,
-    status: paymentMethod === "cash" ? "placed" : "waitPayment",
+    status: paymentMethod == "cash" ? "placed" : "waitPayment",
     phone,
     address,
   });
 
+  if (req.body?.coupon) {
+    await couponModel.updateOne({ _id: req.body.coupon._id }, { $push: { usedBy: req.user._id } });
+  }
+
+  for (const product of finalProducts) {
+    await productModel.findByIdAndUpdate(
+      { _id: product.productId },
+      {
+        $inc: { stock: -product.quantity },
+      }
+    );
+  }
+
+  if (flag) {
+    await cartModel.updateOne({ user: req.user._id }, { products: [] });
+  }
+
   res.status(201).json({ msg: "done", order });
+});
+
+//==================================== cancelOrder ===================================================
+
+export const cancelOrder = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const { reason } = req.body;
+  const order = await orderModel.findOne({ _id: id, user: req.user._id });
+  if (!order) {
+    return next(new AppError("order not found", 404));
+  }
+  if (
+    (order.paymentMethod == "cash" && order.status != "placed") ||
+    (order.paymentMethod == "card" && order.status != "waitPayment")
+  ) {
+    return next(new AppError("you can not cancel this order", 400));
+  }
+
+  if (order?.couponId) {
+    await couponModel.updateOne({ _id: order?.couponId }, { $pull: { usedBy: req.user._id } });
+  }
+
+  for (const product of finalProducts) {
+    await productModel.findByIdAndUpdate(
+      { _id: product.productId },
+      {
+        $inc: { stock: product.quantity },
+      }
+    );
+  }
 });

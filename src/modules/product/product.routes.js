@@ -5,10 +5,12 @@ import { validation } from "../../middleware/validation.js";
 import { auth } from "../../middleware/auth.js";
 import * as SCV from "./product.validation.js";
 import reviewRouter from "../review/review.routes.js";
+import wishListRouter from "../wishList/wishList.routes.js";
 
 const productRouter = express.Router();
 
 productRouter.use("/:productId/reviews", reviewRouter);
+productRouter.use("/:productId/wishLists", wishListRouter);
 
 productRouter.post(
   "/",

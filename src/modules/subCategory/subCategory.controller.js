@@ -45,7 +45,6 @@ export const createSubCategory = asyncHandler(async (req, res, next) => {
   res.status(201).json({ msg: "done", subCategory });
 });
 //==================================== updateSubCategory ===================================================
-//you should do it
 
 //==================================== getSubCategories ===================================================
 

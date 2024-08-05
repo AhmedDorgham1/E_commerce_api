@@ -23,4 +23,6 @@ productRouter.post(
   PC.createProduct
 );
 
+productRouter.get("/", PC.getProducts);
+
 export default productRouter;

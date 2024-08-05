@@ -75,3 +75,16 @@ export const createProduct = asyncHandler(async (req, res, next) => {
 
   res.status(201).json({ msg: "done", product });
 });
+
+//==================================== getProducts ===================================================
+
+export const getProducts = asyncHandler(async (req, res, next) => {
+  const page = req.query.page * 1 || 1;
+  if (page < 1) page = 1;
+  const limit = 2;
+  const skip = (page - 1) * limit;
+
+  const products = await productModel.find().skip(skip).limit(limit);
+
+  res.status(200).json({ msg: "done", products });
+});

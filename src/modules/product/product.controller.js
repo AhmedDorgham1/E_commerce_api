@@ -77,14 +77,44 @@ export const createProduct = asyncHandler(async (req, res, next) => {
 });
 
 //==================================== getProducts ===================================================
-
 export const getProducts = asyncHandler(async (req, res, next) => {
-  const page = req.query.page * 1 || 1;
+  //pagination
+  console.log(req.query.page * 1);
+  let page = req.query.page * 1 || 1;
   if (page < 1) page = 1;
-  const limit = 2;
-  const skip = (page - 1) * limit;
+  let limit = 2;
+  let skip = (page - 1) * limit;
 
-  const products = await productModel.find().skip(skip).limit(limit);
+  //filter
+  let excludeQuery = ["page", "sort", "search", "select"];
+  let filterQuery = { ...req.query }; //deep copy
+  excludeQuery.forEach((e) => delete filterQuery[e]);
+  filterQuery = JSON.parse(JSON.stringify(filterQuery).replace(/(gt|lt|gte|lte|eq)/, (match) => `$${match}`));
+  // console.log(filterQuery);
 
-  res.status(200).json({ msg: "done", products });
+  const mongooseQuery = productModel.find(filterQuery).skip(skip).limit(limit);
+  //sort
+  //http://localhost:3000/products?sort=price,discount
+  if (req.query.sort) {
+    mongooseQuery.sort(req.query.sort.replaceAll(",", " "));
+  }
+  //select
+  //http://localhost:3000/products?sort=price,discount&select=title
+  if (req.query.select) {
+    mongooseQuery.select(req.query.select.replaceAll(",", " "));
+  }
+
+  //search
+  //http://localhost:3000/products?search=fash5
+  if (req.query.search) {
+    mongooseQuery.find({
+      $or: [
+        { title: { $regex: req.query.search, $options: "i" } },
+        { description: { $regex: req.query.search, $options: "i" } },
+      ],
+    });
+  }
+  //
+  const products = await mongooseQuery;
+  res.status(200).json({ msg: "done", page, products });
 });
